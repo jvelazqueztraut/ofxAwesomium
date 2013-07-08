@@ -6,7 +6,6 @@ void testApp::setup(){
 	webTexWidth = ofGetWindowWidth();
 	webTexHeight = ofGetWindowHeight();
     webTex.allocate(webTexWidth, webTexHeight, GL_RGBA);
-    webPixels.allocate(webTexWidth,webTexHeight,OF_IMAGE_COLOR_ALPHA);
     
     // Disable scrollbars via the WebCoreConfig
     Awesomium::WebConfig config;
@@ -41,10 +40,9 @@ void testApp::update(){
     // Call our display func when the WebView needs rendering
 	//if (webView->isDirty()) {
         //const Awesomium::RenderBuffer* renderBuffer = webView->render();
-        Awesomium::Surface* renderSurface = webView->surface();
+        Awesomium::BitmapSurface* renderSurface = (Awesomium::BitmapSurface*)webView->surface();
         if (renderSurface) {
-            renderSurface->Paint(webPixels.getPixels(),webTexWidth*4,Awesomium::Rect(0,0,webTexWidth,webTexHeight),Awesomium::Rect(0,0,webTexWidth,webTexHeight));
-            webTex.loadData(webPixels.getPixels(), webTexWidth, webTexHeight, GL_BGRA);
+            webTex.loadData(renderSurface->buffer(), webTexWidth, webTexHeight, GL_BGRA);
         }
     //}
 }

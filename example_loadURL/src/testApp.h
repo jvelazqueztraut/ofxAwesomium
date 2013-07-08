@@ -28,5 +28,4 @@ private:
 	int webTexWidth;
 	int webTexHeight;
 	ofTexture webTex;
-    ofPixels webPixels;
 };
