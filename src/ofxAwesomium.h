@@ -2,25 +2,32 @@
 
 #include "ofMain.h"
 #include <Awesomium/WebCore.h>
+#include <Awesomium/BitmapSurface.h>
+#include <Awesomium/STLHelpers.h>
 
-
-class testApp : public ofBaseApp {
+class ofxAwesomium {
 public:
-	void setup();
+	void setup(int width, int height);
 	void update();
 	void draw();
+	void draw(float x, float y);
+	void draw(float x, float y, float w, float h);
 	void exit();
-	void keyPressed  (int key);
-	void keyReleased(int key);
+	void keyPressed(int key);
 	void mouseMoved(int x, int y);
 	void mouseDragged(int x, int y, int button);
 	void mousePressed(int x, int y, int button);
 	void mouseReleased(int x, int y, int button);
-	void windowResized(int w, int h);
-	
-	
-private:
+	void focus();
+	void loadURL(string URL);
+	bool isLoading();
+
 	Awesomium::WebView* webView;
+    
+private:
+	void injectKey(int keyCode);
+
+	Awesomium::WebSession* webSession;
 	Awesomium::WebCore* webCore;
 	
 	int webTexWidth;

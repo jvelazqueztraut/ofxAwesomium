@@ -1,13 +1,61 @@
+# src is the official directory
+!src/
+!example/
 
+# ignore bin folders' contents, except data folder therein
+example/bin/
+!example/bin/data/
+
+#ignore the WebSession folder
+example/bin/data/WebSession/
+
+# Compiled Object folder
+example/obj/
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Compiled Dynamic libraries
+*.so
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+#Compiled app
+*.app
+
+#Codeblocks files
+*.workspace
+*.cbp
+*.layout
+
+#Visual C++ files
+ipch
+*.sdf
+*.opensdf
+*.sln
+*.suo
+*.vcxproj
+*.filters
+*.user
+
+#XCode files
+*.plist
+*.xcconfig
+*.xcodeproj
+
+#Misc files
+*.wav
+*.mp3
+*.png
+*.jpg
+*.jpeg
+*.mov
 *.DS_Store
 
-
-Awesomium.framework
-
-
-#Xcode
-*.pbxuser
-*.mode1v3
-
-*.app
-*build
+# don't ignore the .gitignore file
+!.gitignore

@@ -1,65 +1,80 @@
-#include "testApp.h"
-#include <Awesomium/BitmapSurface.h>
-#include <Awesomium/STLHelpers.h>
+#include "ofxAwesomium.h"
 
-void testApp::setup(){
-	webTexWidth = ofGetWindowWidth();
-	webTexHeight = ofGetWindowHeight();
+void ofxAwesomium::setup(int width, int height){
+	webTexWidth = width;
+	webTexHeight = height;
     webTex.allocate(webTexWidth, webTexHeight, GL_RGBA);
     
     // Disable scrollbars via the WebCoreConfig
     Awesomium::WebConfig config;
-    //config.setCustomCSS("::-webkit-scrollbar { display: none; }");
+	//Awesomium::WebStringArray configStrings;
+	//configStrings.Push(Awesomium::WSLit("::-webkit-user-select { display: none; }"));
+	//configStrings.Push(Awesomium::WSLit("::-webkit-scrollbar { display: none; }"));
+	//config.additional_options=configStrings;
     
-    
-    // Create the WebCore singleton with default configuration
+	// Create the WebCore singleton with default configuration
     webCore = Awesomium::WebCore::Initialize(config);
     
+	Awesomium::WebPreferences prefs;
+	prefs.enable_web_security = false;
+
+	string path = ofToDataPath("WebSession/",true);
+	// Create the WebSession
+    webSession = webCore->CreateWebSession(Awesomium::WebString(Awesomium::WSLit(path.c_str())),prefs);
 
 	// Create a new WebView instance with a certain width and height, using the
 	// WebCore we just created
-	webView = webCore->CreateWebView(webTexWidth, webTexHeight);
-	
-    Awesomium::WebURL url(Awesomium::WSLit("http://www.google.com"));
-	// Load a certain URL into our WebView instance
-	webView->LoadURL(url);
-	
-	webView->Focus();
+	webView = webCore->CreateWebView(webTexWidth, webTexHeight, webSession);
+
+}
+void ofxAwesomium::focus(){
+    webView->Focus();
 }
 
+void ofxAwesomium::loadURL(string URL){
+	Awesomium::WebURL url(Awesomium::WSLit(URL.c_str()));
+	// Load a certain URL into our WebView instance
+	webView->LoadURL(url);
+}
 
-void testApp::exit(){
+bool ofxAwesomium::isLoading(){
+	return webView->IsLoading();
+}
+
+void ofxAwesomium::exit(){
     // Destroy our WebView instance
 	webView->Destroy();
+	webSession->Release();
     Awesomium::WebCore::Shutdown();
 }
 
-
-void testApp::update(){
+void ofxAwesomium::update(){
     webCore->Update();
     // Call our display func when the WebView needs rendering
 	//if (webView->isDirty()) {
-        //const Awesomium::RenderBuffer* renderBuffer = webView->render();
-        Awesomium::BitmapSurface* renderSurface = (Awesomium::BitmapSurface*)webView->surface();
-        if (renderSurface) {
-            webTex.loadData(renderSurface->buffer(), webTexWidth, webTexHeight, GL_BGRA);
+        //const Awesomium::RenderBuffer* renderBuffer = webView->render()
+        Awesomium::BitmapSurface* surface = (Awesomium::BitmapSurface*)webView->surface();
+        if (surface) {
+            webTex.loadData(surface->buffer(), webTexWidth, webTexHeight, GL_BGRA);
         }
     //}
 }
 
 
-void testApp::draw(){
-    ofSetColor(255);
+void ofxAwesomium::draw(){
 	webTex.draw(0, 0);
-	
-    if (webView->IsLoading()) {
-        ofSetColor(0);
-        ofDrawBitmapString("Loading...", 10, ofGetHeight()-20);
-    }
+}
+
+void ofxAwesomium::draw(float x, float y){
+	webTex.draw(x, y);
+}
+
+void ofxAwesomium::draw(float x, float y, float w, float h){
+	webTex.draw(x, y, w, h);
 }
 
 
-void testApp::keyPressed(int key){
+void ofxAwesomium::keyPressed(int key){
     switch(key) {
         case 8: case 127:
             injectKey(Awesomium::KeyCodes::AK_BACK);
@@ -102,13 +117,7 @@ void testApp::keyPressed(int key){
 	webView->InjectKeyboardEvent(keyEvent);
 }
 
-
-void testApp::keyReleased(int key){
-
-}
-
-
-void testApp::injectKey(int keyCode) {
+void ofxAwesomium::injectKey(int keyCode) {
 	Awesomium::WebKeyboardEvent keyEvent;
     
 	char* buf = new char[20];
@@ -130,26 +139,21 @@ void testApp::injectKey(int keyCode) {
 
 
 
-void testApp::mouseMoved(int x, int y ){
+void ofxAwesomium::mouseMoved(int x, int y ){
     webView->InjectMouseMove(x, y);
 }
 
 
-void testApp::mouseDragged(int x, int y, int button){
+void ofxAwesomium::mouseDragged(int x, int y, int button){
     webView->InjectMouseMove(x, y);
 }
 
 
-void testApp::mousePressed(int x, int y, int button){
+void ofxAwesomium::mousePressed(int x, int y, int button){
     webView->InjectMouseDown(Awesomium::kMouseButton_Left);
 }
 
 
-void testApp::mouseReleased(int x, int y, int button){
+void ofxAwesomium::mouseReleased(int x, int y, int button){
     webView->InjectMouseUp(Awesomium::kMouseButton_Left);
-}
-
-
-void testApp::windowResized(int w, int h){
-
 }
